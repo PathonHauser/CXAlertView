@@ -12,6 +12,8 @@
 #import "CXAlertViewController.h"
 #import "CXAlertButtonContainerView.h"
 #import <QuartzCore/QuartzCore.h>
+#import <MASAttributes/NSMutableAttributedString+Attributes.h>
+
 
 #import "LFGlassView.h"
 
@@ -190,6 +192,39 @@ static CXAlertView *__cx_alert_current_view;
     }
     return self;
 }
+
+- (id)initWithAttributedTitle:(NSMutableAttributedString *)title contentView:(UIView *)contentView cancelButtonAttributedTitle:(NSMutableAttributedString *)cancelButtonTitle
+{
+    self = [super init];
+    if (self) {
+        _buttons = [[NSMutableArray alloc] init];
+        _attributedTitle = title;
+        _title = title.string;
+        _contentView = contentView;
+        
+        _scrollViewPadding = kDefaultScrollViewPadding;
+        _buttonHeight = kDefaultButtonHeight;
+        _containerWidth = kDefaultContainerWidth;
+        _vericalPadding = kDefaultVericalPadding;
+        _topScrollViewMaxHeight = kDefaultTopScrollViewMaxHeight;
+        _topScrollViewMinHeight = kDefaultTopScrollViewMinHeight;
+        _contentScrollViewMaxHeight = kDefaultContentScrollViewMaxHeight;
+        _contentScrollViewMinHeight = kDefaultContentScrollViewMinHeight;
+        _bottomScrollViewHeight = kDefaultBottomScrollViewHeight;
+        
+        _showButtonLine = YES;
+        _showBlurBackground = YES;
+        [self setupScrollViews];
+        if (cancelButtonTitle) {
+            [self addButtonWithAttributedTitle:cancelButtonTitle type:CXAlertViewButtonTypeCancel handler:^(CXAlertView *alertView, CXAlertButtonItem *button) {
+                [alertView dismiss];
+            }];
+        }
+    }
+    return self;
+}
+
+
 // Buttons
 - (void)addButtonWithTitle:(NSString *)title type:(CXAlertViewButtonType)type handler:(CXAlertButtonHandler)handler
 {
@@ -426,7 +461,7 @@ static CXAlertView *__cx_alert_current_view;
         return;
     }
     self.layoutDirty = NO;
-
+    
     CGFloat height = [self preferredHeight];
     CGFloat left = (self.bounds.size.width - self.containerWidth) * 0.5;
     CGFloat top = (self.bounds.size.height - height - 216) * 0.5;
@@ -491,7 +526,7 @@ static CXAlertView *__cx_alert_current_view;
 
 - (void)updateTopScrollView
 {
-    if (self.title) {
+    if (self.title || self.attributedTitle) {
         if (!_titleLabel) {
             _titleLabel = [[UILabel alloc] init];
             [_topScrollView addSubview:_titleLabel];
@@ -523,7 +558,7 @@ static CXAlertView *__cx_alert_current_view;
         }
         
         [_topScrollView setScrollEnabled:([self heightForTopScrollView] < CGRectGetHeight(_titleLabel.frame))];
-
+        
     }
     else {
         [_titleLabel removeFromSuperview];
@@ -715,6 +750,12 @@ static CXAlertView *__cx_alert_current_view;
 - (void)addButtonWithAttributedTitle:(NSMutableAttributedString*)title type:(CXAlertViewButtonType)type handler:(CXAlertButtonHandler)handler {
     CXAlertButtonItem *button = [self buttonItemWithType:type font:nil];
     [button setAttributedTitle:title forState:UIControlStateNormal];
+    
+    NSMutableAttributedString *highlightedTitle = [NSMutableAttributedString new];
+    [highlightedTitle setAttributedString:title];
+    [highlightedTitle addColor:[UIColor whiteColor] substring:highlightedTitle.string];
+    [button setAttributedTitle:highlightedTitle forState:UIControlStateHighlighted];
+    
     button.action = handler;
     button.type = type;
     button.defaultRightLineVisible = _showButtonLine;
@@ -762,7 +803,7 @@ static CXAlertView *__cx_alert_current_view;
 - (CXAlertButtonItem *)buttonItemWithType:(CXAlertViewButtonType)type font:(UIFont *)font
 {
 	CXAlertButtonItem *button = [CXAlertButtonItem buttonWithType:UIButtonTypeCustom];
-//	button.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+    //	button.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     button.titleLabel.font = font;
 	UIImage *normalImage = nil;
 	UIImage *highlightedImage = nil;
