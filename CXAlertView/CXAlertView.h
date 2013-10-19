@@ -15,6 +15,7 @@ typedef void(^CXAlertViewHandler)(CXAlertView *alertView);
 
 @property (nonatomic, copy) NSString *title;
 @property (nonatomic, copy) UIView *contentView;
+@property (nonatomic, copy) NSMutableAttributedString *attributedTitle;
 
 @property (nonatomic, copy) CXAlertViewHandler willShowHandler;
 @property (nonatomic, copy) CXAlertViewHandler didShowHandler;

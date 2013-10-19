@@ -429,7 +429,7 @@ static CXAlertView *__cx_alert_current_view;
 
     CGFloat height = [self preferredHeight];
     CGFloat left = (self.bounds.size.width - self.containerWidth) * 0.5;
-    CGFloat top = (self.bounds.size.height - height) * 0.5;
+    CGFloat top = (self.bounds.size.height - height - 216) * 0.5;
     _containerView.transform = CGAffineTransformIdentity;
     _blurView.transform = CGAffineTransformIdentity;
     if (_updateAnimated) {
@@ -508,7 +508,12 @@ static CXAlertView *__cx_alert_current_view;
         _titleLabel.minimumFontSize = self.titleLabel.font.pointSize * 0.75;
 #endif
         _titleLabel.frame = CGRectMake( self.vericalPadding, 0, self.containerWidth - self.vericalPadding*2, [self heightWithText:self.title font:_titleLabel.font]);
-        _titleLabel.text = self.title;
+        if (_attributedTitle.length != 0){
+            _titleLabel.attributedText = _attributedTitle;
+        }
+        else {
+            _titleLabel.text = self.title;
+        }
         
         _topScrollView.frame = CGRectMake( 0 , self.scrollViewPadding, self.containerWidth, [self heightForTopScrollView]);
         _topScrollView.contentSize = _titleLabel.bounds.size;
