@@ -705,10 +705,24 @@ static CXAlertView *__cx_alert_current_view;
 - (void)addButtonWithTitle:(NSString *)title type:(CXAlertViewButtonType)type handler:(CXAlertButtonHandler)handler font:(UIFont *)font
 {
     CXAlertButtonItem *button = [self buttonItemWithType:type font:font];
+    [button setTitle:title forState:UIControlStateNormal];
     button.action = handler;
     button.type = type;
     button.defaultRightLineVisible = _showButtonLine;
-    [button setTitle:title forState:UIControlStateNormal];
+    [self prepareButton:button withType:type andHandler:handler];
+}
+
+- (void)addButtonWithAttributedTitle:(NSMutableAttributedString*)title type:(CXAlertViewButtonType)type handler:(CXAlertButtonHandler)handler {
+    CXAlertButtonItem *button = [self buttonItemWithType:type font:nil];
+    [button setAttributedTitle:title forState:UIControlStateNormal];
+    button.action = handler;
+    button.type = type;
+    button.defaultRightLineVisible = _showButtonLine;
+    [self prepareButton:button withType:type andHandler:handler];
+}
+
+- (void)prepareButton:(CXAlertButtonItem*)button withType:(CXAlertViewButtonType)type andHandler:(CXAlertButtonHandler)handler{
+    
     if ([_buttons count] == 0) {
         button.defaultRightLineVisible = NO;
         button.frame = CGRectMake( self.containerWidth/4, 0, self.containerWidth/2, self.buttonHeight);
@@ -743,6 +757,7 @@ static CXAlertView *__cx_alert_current_view;
     CGFloat newContentWidth = self.bottomScrollView.contentSize.width + CGRectGetWidth(button.frame);
     _bottomScrollView.contentSize = CGSizeMake( newContentWidth, self.buttonHeight);
 }
+
 
 - (CXAlertButtonItem *)buttonItemWithType:(CXAlertViewButtonType)type font:(UIFont *)font
 {
